@@ -25,12 +25,15 @@ app.use(session({
   saveUninitialized: false
 }));
 
+require('dotenv').config();
+
 const db = mysql.createConnection({
-  host: '34.60.230.173',
-  user: 'photo_user',
-  password: 'Photo@1234',
-  database: 'photo_gallery'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME
 });
+
 
 db.connect(err => {
   if (err) return console.error('❌ DB connection failed:', err);
@@ -169,5 +172,5 @@ app.get('/api/download/:filename', (req, res) => {
 
 
 app.listen(port, () => {
-  console.log(`🚀 Server running at http://localhost:${port}`);
+  console.log(`🚀 Server running on port ${port}`);
 });
