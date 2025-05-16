@@ -83,6 +83,16 @@ const upload = multer({ storage });
 const buildPath = path.join(__dirname, 'build');
 app.use(express.static(buildPath));
 
+// ✅ Health check endpoint
+app.get('/api/health', (req, res) => {
+  db.ping(err => {
+    if (err) {
+      return res.status(500).send('Database not reachable');
+    }
+    res.status(200).send('OK');
+  });
+});
+
 // Catch-all to send React index.html (for React Router)
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api') || req.path.startsWith('/uploads') || req.path.startsWith('/download')) {
