@@ -34,10 +34,42 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME
 });
 
+function runMigrations() {
+  const userTable = `
+    CREATE TABLE IF NOT EXISTS users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      username VARCHAR(255) UNIQUE NOT NULL,
+      password_hash VARCHAR(255) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
+  const photoTable = `
+    CREATE TABLE IF NOT EXISTS photos (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      photo_url VARCHAR(500) NOT NULL,
+      uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+  `;
+
+  db.query(userTable, err => {
+    if (err) console.error('Error creating users table:', err);
+    else console.log('✅ Users table ready');
+  });
+
+  db.query(photoTable, err => {
+    if (err) console.error('Error creating photos table:', err);
+    else console.log('✅ Photos table ready');
+  });
+}
+
 
 db.connect(err => {
   if (err) return console.error('❌ DB connection failed:', err);
   console.log('✅ Connected to MySQL!');
+  runMigrations();
 });
 
 const storage = multer.diskStorage({
